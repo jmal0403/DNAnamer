@@ -19,5 +19,5 @@ Imports:
     caret,
     stringr, 
     dplyr,
-    svm
+    e1071
 VignetteBuilder: knitr
