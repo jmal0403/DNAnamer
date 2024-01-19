@@ -1,7 +1,7 @@
 runSVM <- function(final.df){
   library(caret)
   set.seed(29)
-  train_index <- createDataPartition(y=final.df$class, p=0.5, list=FALSE)
+  train_index <- caret::createDataPartition(y=final.df$class, p=0.5, list=FALSE)
   train.df <- final.df[train_index, ]
   test.df <- final.df[-train_index, ]
   svm.fit <- classifySeqSVM(train.df, 3, 0.2)
