@@ -20,5 +20,6 @@ Imports:
     stringr, 
     dplyr,
     e1071,
-    pROC
+    pROC,
+    randomForest
 VignetteBuilder: knitr
