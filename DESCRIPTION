@@ -19,5 +19,6 @@ Imports:
     caret,
     stringr, 
     dplyr,
-    e1071
+    e1071,
+    pROC
 VignetteBuilder: knitr
