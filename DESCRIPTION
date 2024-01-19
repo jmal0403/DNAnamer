@@ -8,3 +8,8 @@ Description: A toolkit for the binary and multi-class supervised classification 
 License: 
 Encoding: UTF-8
 LazyData: true
+Suggests: 
+    testthat,
+    knitr,
+    rmarkdown
+VignetteBuilder: knitr
