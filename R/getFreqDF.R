@@ -1,3 +1,4 @@
+library(seqinr)
 getFreqDF <- function(seq.df, total.seq.length, seg.len, order, organism)
   {
   seq.vector <- sapply(strsplit(seq.df$seq, ""), function(x) x[1:length(x)], simplify=FALSE)
