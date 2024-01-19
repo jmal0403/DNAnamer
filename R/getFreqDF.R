@@ -1,6 +1,6 @@
-library(seqinr)
-getFreqDF <- function(seq.df, total.seq.length, seg.len, order, organism)
-  {
+getFreqDF <- function(seq.df, total.seq.length, seg.len, order, organism) {
+  library(seqinr)
+  library(dplyr)
   seq.vector <- sapply(strsplit(seq.df$seq, ""), function(x) x[1:length(x)], simplify=FALSE)
   alpha <- c("A","C","G","T")
   i=1
