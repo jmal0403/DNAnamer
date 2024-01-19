@@ -1,5 +1,6 @@
 runSVM <- function(final.df){
   library(caret)
+  library(pROC)
   set.seed(29)
   train_index <- caret::createDataPartition(y=final.df$class, p=0.5, list=FALSE)
   train.df <- final.df[train_index, ]
