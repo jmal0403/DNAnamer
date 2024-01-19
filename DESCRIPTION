@@ -17,5 +17,5 @@ Imports:
     seqinr,
     fastmap,
     caret,
-    tidyverse
+    stringr
 VignetteBuilder: knitr
