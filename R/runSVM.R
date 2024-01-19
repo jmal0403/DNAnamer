@@ -8,6 +8,6 @@ runSVM <- function(final.df){
   svm.fit <- classifySeqSVM(train.df, 3, 0.2)
   y_pred = predict(svm.fit, newdata = test.df[,-(ncol(test.df))], decision.values =TRUE)
   print(table(test.df$class==y_pred))
-  roc_svm_test <- roc(response=test.df$class, predictor = as.numeric(y_pred))
+  roc_svm_test <- pROC::roc(response=test.df$class, predictor = as.numeric(y_pred))
   roc_svm_test
 }
