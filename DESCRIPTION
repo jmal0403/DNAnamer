@@ -13,6 +13,8 @@ Imports:
     knitr,
     rmarkdown,
     biomartr,
+    BiocManager,
     seqinr,
+    fastmap,
     caret
 VignetteBuilder: knitr
