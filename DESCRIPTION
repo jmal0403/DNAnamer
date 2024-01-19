@@ -16,5 +16,6 @@ Imports:
     BiocManager,
     seqinr,
     fastmap,
-    caret
+    caret,
+    tidyverse
 VignetteBuilder: knitr
