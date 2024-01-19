@@ -1,0 +1,169 @@
+library(Biostrings)
+library(biomartr)
+library(caret)
+library(e1071)
+library(kernlab)
+library(pROC)
+library(ROCR)
+library(randomForest)
+library(randomForestExplainer)
+library(ggsignif)
+library(quanteda)
+library(reshape2)
+library(ggplot2)
+library(plyr)
+library(ggpubr)
+library(dplyr)
+library(stringr)
+library(rstatix)
+library(randtests)
+library(bench)
+
+## Functions 
+### ****  ### 
+
+getFreqTables <- function(df, order, organism) {
+  if (order == 2) {
+    freq.df <- as.data.frame(t(df[,1:(4^order)]))
+    freq.df$organism <-organism
+    freq.df<- as.data.frame(cbind(seq=rownames(freq.df), freq.df))
+    return(freq.df)
+  }
+  if (order == 3) {
+    start <- 4^2+1
+    freq.df <- as.data.frame(t(df[,start:(4^order+4^2)]))
+    freq.df$organism <-organism
+    freq.df<- as.data.frame(cbind(seq=rownames(freq.df), freq.df))
+    return(freq.df)
+  }
+}
+
+runSVM <- function(final.df){
+  set.seed(29)
+  train_index <- createDataPartition(y=final.df$class, p=0.5, list=FALSE)
+  train.df <- final.df[train_index, ]
+  test.df <- final.df[-train_index, ]
+  svm.fit <- classifySeqSVM(train.df, 3, 0.2)
+  y_pred = predict(svm.fit, newdata = test.df[,-(ncol(test.df))], decision.values =TRUE)
+  print(table(test.df$class==y_pred))
+  roc_svm_test <- roc(response=test.df$class, predictor = as.numeric(y_pred))
+  roc_svm_test
+}
+
+classifySeqSVM <- function(train.df, cost, sigma) {
+  # Cost affects performance and should be used in sensitivity analysis
+  kernel.type<-'radial'
+  classification.machine<-'C-classification'
+  svmfit = svm(formula = as.factor(class) ~ .,data = train.df, cost=cost, type =classification.machine, kernel = kernel.type, probability=TRUE, sigma=sigma)
+  return(svmfit)
+} 
+
+getFreqDF <- function(seq.df, total.seq.length, seg.len, order, organism) {
+  seq.vector <- sapply(strsplit(seq.df$seq, ""), function(x) x[1:length(x)], simplify=FALSE)
+  alpha <- c("A","C","G","T")
+  i=1
+  freq.2nd<-NULL
+  freq.3rd<-NULL
+  freq.4th<-NULL
+  freq.5th<-NULL
+  
+  ## Calculate N-gram frequencies
+  no.training=(total.seq.length/seg.len)
+  for (i in 1:no.training){
+    if (order == 5) {
+      freq.5th <- rbind(freq.5th, seqinr::count(seq.vector[[i]], 5, alphabet=alpha,freq=TRUE))
+      freq.4th <- rbind(freq.4th, seqinr::count(seq.vector[[i]], 4, alphabet=alpha,freq=TRUE))
+      freq.3rd<- rbind(freq.3rd, seqinr::count(seq.vector[[i]], 3, alphabet=alpha,freq=TRUE))
+      freq.2nd <- rbind(freq.2nd, seqinr::count(seq.vector[[i]], 2, alphabet=alpha,freq=TRUE))
+    }  
+    else if (order == 4) {
+      freq.4th <- rbind(freq.4th, seqinr::count(seq.vector[[i]], 4, alphabet=alpha,freq=TRUE))
+      freq.3rd<- rbind(freq.3rd, seqinr::count(seq.vector[[i]], 3, alphabet=alpha,freq=TRUE))
+      freq.2nd <- rbind(freq.2nd, seqinr::count(seq.vector[[i]], 2, alphabet=alpha,freq=TRUE))
+    }  
+    else if (order > 2) {
+      freq.3rd<- rbind(freq.3rd, seqinr::count(seq.vector[[i]], 3, alphabet=alpha,freq=TRUE))
+      freq.2nd <- rbind(freq.2nd, seqinr::count(seq.vector[[i]], 2, alphabet=alpha,freq=TRUE))
+    }
+    else {
+      freq.2nd <- rbind(freq.2nd, seqinr::count(seq.vector[[i]], 2, alphabet=alpha,freq=TRUE))
+    }
+  }
+  
+  if (order == 5) {
+    freq.5th <- as.data.frame(freq.5th)
+    freq.5th$class <- organism
+    freq.4th<- as.data.frame(freq.4th)
+    freq.3rd <- as.data.frame(freq.3rd)
+    freq.2nd <- as.data.frame(freq.2nd)
+    final.df <- cbind(freq.2nd, freq.3rd, freq.4th, freq.5th)
+  }
+  else if (order == 4) {
+    freq.4th<- as.data.frame(freq.4th)
+    freq.4th$class <- organism
+    freq.3rd <- as.data.frame(freq.3rd)
+    freq.2nd <- as.data.frame(freq.2nd)
+    final.df <- cbind(freq.2nd, freq.3rd, freq.4th)
+  }
+  if (order == 3) {
+    freq.3rd <- as.data.frame(freq.3rd)
+    freq.3rd$class <- organism
+    freq.2nd <- as.data.frame(freq.2nd)
+    final.df <- cbind(freq.2nd, freq.3rd)
+  }
+  if (order == 2) {
+    freq.2nd <- as.data.frame(freq.2nd)
+    freq.2nd$class <- organism
+    final.df <- freq.2nd
+  }
+  freq.2nd<-NULL
+  freq.3rd<-NULL
+  freq.4th<-NULL
+  freq.5th<-NULL
+  final.df <-na.omit(final.df)
+  return(final.df) 
+}
+
+splitStr <- function(x, n) {
+  sst <- strsplit(x, '')[[1]]
+  m <- matrix('', nrow=n, ncol=(length(sst)+n-1)%/%n)
+  m[seq_along(sst)] <- sst
+  apply(m, 2, paste, collapse='')
+}
+
+getSeqFromGenome <- function(organism.name, Genome, total.seq.length, seg.len) {
+  # Join all contigs
+  if (organism.name == "Homo sapiens") {
+    seq.char <- toString(Genome[2:33])
+  }
+  else if (organism.name == "Elephas maximus") {
+    seq.char <- toString(Genome[1:15])
+  }
+  else if (organism.name == "Phascolarctos cinereus") {
+    seq.char <- toString(Genome[1:8])
+  }
+  else if (organism.name == "Delphinus delphis") {
+    seq.char <- toString(Genome[1:10])
+  }
+  else {
+    seq.char <- toString(Genome[1:length(Genome)])
+  }
+  genome.len <- sum(nchar(seq.char))
+  start.index <- sample(1:(genome.len-total.seq.length),1,replace=F) 
+  seq.char <- substr(seq.char,start=start.index,stop=start.index+total.seq.length+1)
+  seq.char <- str_replace(seq.char, "N", "")
+  seq.df <- as.data.frame(splitStr(seq.char, seg.len))
+  colnames(seq.df)<- "seq"
+  return(seq.df)
+}
+
+loadRefGenome <- function(organism.name) {
+  # 168,733 bp
+  #EC.genome.refseq <- getGenome(db = "refseq", organism = "Escherichia coli", path = file.path("_ncbi_downloads","genomes")) 
+  #Ecoli.Genome <- read_genome(file = EC.genome.refseq)
+  #CE.genome.refseq <- getGenome(db = "refseq", organism = "Caenorhabditis elegans", path = file.path("_ncbi_downloads","genomes")) 
+  #Celegans.Genome <- read_genome(file = CE.genome.refseq)  genome.refseq <- getGenome(db = "refseq", organism = organism.name, path = file.path("_ncbi_downloads","genomes")) 
+  genome.refseq <- getGenome(db = "refseq", organism = organism.name, path = file.path("_ncbi_downloads","genomes")) 
+  Genome <-  read_genome(file = genome.refseq)
+  return(Genome)  
+}

@@ -1,0 +1,105 @@
+---
+title: "DNA N-gram Analysis Framework (DNA-NAMER)"
+author: "John Stephen Malamon, PhD"
+date: "January 18, 2024"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{DNA-NAMER}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  eval = FALSE,
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+# Introduction:
+
+The discrete information source of DNA, nucleotide sequences, can be adequately represented as a stochastic process similar to Shannon’s language model (1948), where nucleotides [“A”,”C”,“G”,“T”] are analogous to the letters of a word and nucleotide sequence N-grams are analogous to the words of a sentence. The total number of N-gram sequences in a set is equal to $4^N$, where N is the order or the number of consecutive nucleotide sequences. For example, the second-order N-gram sequence set is:
+
+[“AA”,“AC”,“AG”,“AT”,“CA”,“CC”,“CG”,“CT”,“GA”,“GC”,“GG”,“GT”,“TA”,“TC”,“TG”,“TT”]. 
+
+This methodology relies on two additional hypotheses. $H_2$ requires that DNA N-grams such as bi-, tri-, and tetra-nucleotide pairings do not occur randomly, and H3 requires that these N-gram frequency patterns are conserved and identifiable. In fact, it has been well-demonstrated that di-, tri-, and poly-nucleotide repeats are not random and highly conserved. Given $H_2$ and $H_3$, DNA N-gram frequency patterns can be leveraged to construct a generalized stochastic model which can be used to efficiently solve a variety of supervised classification and data reduction problems relevant to genomics and genetics.
+
+# Overview:
+
+A graphic illustration of this methodology and experimental design was provided in **Figure 1**, where continuous DNA segments ranging from 10 to 100kb in length were randomly selected from each of the five species’ (human, bat, elephant, koala, and dolphin) reference genomes to develop a training and validation sets, each consisting of 10Mb of continuous DNA sequence. The main goal of this experiment was to classify unknown sequence fragments based on established DNA N-gram frequency patterns. This experiment also examined the relationship between this model’s classification performance as a function of N-gram order and segment length. Therefore, second, third, fourth, and fifth order N-grams can be analyzed and compared. Specifically, unknown human DNA segments totaling 10Mb and ranging from 10 to 100kb were classified against each of the four mammals. The five sequence lengths tested were 10, 20, 40, 80, and 100kb. The number of validation tests was equal to the total sequence length (10Mb) divided by the segment length.  
+<br>
+```{r echo=FALSE, out.width="90%", fig.cap = "Figure 1. Overview of DNA-NAMER methdology. A generalized stocastic framework for analyzing DNA sequences based on their N-gram frequency patterns."}
+knitr::include_graphics("../FIGURES/Figure_01.png")
+```
+
+## Demonstration 1 - Supervised Binary Classification
+In this demonstration, we will analyze 20MB of DNA sequence from the human and bat reference genomes.
+
+We will calculate fifth-order N-grams to classify unknown DNA sequence fragments 100kb in length from two species (human and bat). 
+
+### Getting Started
+
+To get started, install and load the DNA-NAMER library. First, you'll need "devtools, remotes, and githubinstall" library.
+
+```
+install.packages("devtools")
+library("devtools")
+
+install.packages("remotes")
+library("remotes")
+
+install.packages("githubinstall")
+library("githubinstall")
+
+remotes::install_git("https://gitlab.com/jmal0403/DNAnamer")
+
+```
+### Download Reference Genomes via NCBI
+
+Next, we need to download the reference genomes for both species. 
+
+### Load the data
+``` 
+# Load Human Reference Genome
+human.genome<-loadRefGenome("Homo sapiens")
+# Load Bat Reference Genome
+bat.genome<-loadRefGenome("Miniopterus natalensis")
+```
+
+### Randomly pull sequence data.frames from reference genomes
+```
+# Total Sequence
+total.seq = 20000000
+# N-gram Order
+order=5
+# DNA segment length
+segment.length = 100000
+# Number of Tests
+no.tests<- total.seq/segment.length
+
+# Get Sequence Human Reference Genome
+human.seq.df <- getSequence("Homo sapiens", human.genome, total.seq, segment.length)
+# Load Bat Reference Genome
+bat.seq.df <- getSequence("Miniopterus natalensis", bat.genome, total.seq, segment.length)
+```
+
+### Calculate N-gram frequency tables and construct test-frequency matrix
+``` 
+human.df <- getFreqDF(human.seq.df, total.seq, segment.length, order, "H")
+bat.df <- getFreqDF(bat.seq.df, total.seq, segment.length, order, "B")
+
+```
+
+### Run SVM (binary) classification
+
+The Support Vector Machine (SVM) methodology was selected for the binary classification experiments. 
+Namely, a radial kernel was selected with a cost of 3 and a sigma value of 0.2. 
+
+``` 
+# Add Code
+```
+
+
+## Conclusions
+

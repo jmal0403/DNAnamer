@@ -1,0 +1,374 @@
+<!DOCTYPE html>
+
+<html>
+
+<head>
+
+<meta charset="utf-8" />
+<meta name="generator" content="pandoc" />
+<meta http-equiv="X-UA-Compatible" content="IE=EDGE" />
+
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+
+<meta name="author" content="John Stephen Malamon, PhD" />
+
+<meta name="date" content="2024-01-18" />
+
+<title>DNA N-gram Analysis Framework (DNA-NAMER)</title>
+
+<script>// Pandoc 2.9 adds attributes on both header and div. We remove the former (to
+// be compatible with the behavior of Pandoc < 2.8).
+document.addEventListener('DOMContentLoaded', function(e) {
+  var hs = document.querySelectorAll("div.section[class*='level'] > :first-child");
+  var i, h, a;
+  for (i = 0; i < hs.length; i++) {
+    h = hs[i];
+    if (!/^h[1-6]$/i.test(h.tagName)) continue;  // it should be a header h1-h6
+    a = h.attributes;
+    while (a.length > 0) h.removeAttribute(a[0].name);
+  }
+});
+</script>
+
+<style type="text/css">
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+span.underline{text-decoration: underline;}
+div.column{display: inline-block; vertical-align: top; width: 50%;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+</style>
+
+
+
+
+
+
+
+<style type="text/css">body {
+background-color: #fff;
+margin: 1em auto;
+max-width: 700px;
+overflow: visible;
+padding-left: 2em;
+padding-right: 2em;
+font-family: "Open Sans", "Helvetica Neue", Helvetica, Arial, sans-serif;
+font-size: 14px;
+line-height: 1.35;
+}
+#TOC {
+clear: both;
+margin: 0 0 10px 10px;
+padding: 4px;
+width: 400px;
+border: 1px solid #CCCCCC;
+border-radius: 5px;
+background-color: #f6f6f6;
+font-size: 13px;
+line-height: 1.3;
+}
+#TOC .toctitle {
+font-weight: bold;
+font-size: 15px;
+margin-left: 5px;
+}
+#TOC ul {
+padding-left: 40px;
+margin-left: -1.5em;
+margin-top: 5px;
+margin-bottom: 5px;
+}
+#TOC ul ul {
+margin-left: -2em;
+}
+#TOC li {
+line-height: 16px;
+}
+table {
+margin: 1em auto;
+border-width: 1px;
+border-color: #DDDDDD;
+border-style: outset;
+border-collapse: collapse;
+}
+table th {
+border-width: 2px;
+padding: 5px;
+border-style: inset;
+}
+table td {
+border-width: 1px;
+border-style: inset;
+line-height: 18px;
+padding: 5px 5px;
+}
+table, table th, table td {
+border-left-style: none;
+border-right-style: none;
+}
+table thead, table tr.even {
+background-color: #f7f7f7;
+}
+p {
+margin: 0.5em 0;
+}
+blockquote {
+background-color: #f6f6f6;
+padding: 0.25em 0.75em;
+}
+hr {
+border-style: solid;
+border: none;
+border-top: 1px solid #777;
+margin: 28px 0;
+}
+dl {
+margin-left: 0;
+}
+dl dd {
+margin-bottom: 13px;
+margin-left: 13px;
+}
+dl dt {
+font-weight: bold;
+}
+ul {
+margin-top: 0;
+}
+ul li {
+list-style: circle outside;
+}
+ul ul {
+margin-bottom: 0;
+}
+pre, code {
+background-color: #f7f7f7;
+border-radius: 3px;
+color: #333;
+white-space: pre-wrap; 
+}
+pre {
+border-radius: 3px;
+margin: 5px 0px 10px 0px;
+padding: 10px;
+}
+pre:not([class]) {
+background-color: #f7f7f7;
+}
+code {
+font-family: Consolas, Monaco, 'Courier New', monospace;
+font-size: 85%;
+}
+p > code, li > code {
+padding: 2px 0px;
+}
+div.figure {
+text-align: center;
+}
+img {
+background-color: #FFFFFF;
+padding: 2px;
+border: 1px solid #DDDDDD;
+border-radius: 3px;
+border: 1px solid #CCCCCC;
+margin: 0 5px;
+}
+h1 {
+margin-top: 0;
+font-size: 35px;
+line-height: 40px;
+}
+h2 {
+border-bottom: 4px solid #f7f7f7;
+padding-top: 10px;
+padding-bottom: 2px;
+font-size: 145%;
+}
+h3 {
+border-bottom: 2px solid #f7f7f7;
+padding-top: 10px;
+font-size: 120%;
+}
+h4 {
+border-bottom: 1px solid #f7f7f7;
+margin-left: 8px;
+font-size: 105%;
+}
+h5, h6 {
+border-bottom: 1px solid #ccc;
+font-size: 105%;
+}
+a {
+color: #0033dd;
+text-decoration: none;
+}
+a:hover {
+color: #6666ff; }
+a:visited {
+color: #800080; }
+a:visited:hover {
+color: #BB00BB; }
+a[href^="http:"] {
+text-decoration: underline; }
+a[href^="https:"] {
+text-decoration: underline; }
+
+code > span.kw { color: #555; font-weight: bold; } 
+code > span.dt { color: #902000; } 
+code > span.dv { color: #40a070; } 
+code > span.bn { color: #d14; } 
+code > span.fl { color: #d14; } 
+code > span.ch { color: #d14; } 
+code > span.st { color: #d14; } 
+code > span.co { color: #888888; font-style: italic; } 
+code > span.ot { color: #007020; } 
+code > span.al { color: #ff0000; font-weight: bold; } 
+code > span.fu { color: #900; font-weight: bold; } 
+code > span.er { color: #a61717; background-color: #e3d2d2; } 
+</style>
+
+
+
+
+</head>
+
+<body>
+
+
+
+
+<h1 class="title toc-ignore">DNA N-gram Analysis Framework
+(DNA-NAMER)</h1>
+<h4 class="author">John Stephen Malamon, PhD</h4>
+<h4 class="date">January 18, 2024</h4>
+
+
+
+<div id="introduction" class="section level1">
+<h1>Introduction:</h1>
+<p>The discrete information source of DNA, nucleotide sequences, can be
+adequately represented as a stochastic process similar to Shannon’s
+language model (1948), where nucleotides [“A”,”C”,“G”,“T”] are analogous
+to the letters of a word and nucleotide sequence N-grams are analogous
+to the words of a sentence. The total number of N-gram sequences in a
+set is equal to <span class="math inline">\(4^N\)</span>, where N is the
+order or the number of consecutive nucleotide sequences. For example,
+the second-order N-gram sequence set is:</p>
+<p>[“AA”,“AC”,“AG”,“AT”,“CA”,“CC”,“CG”,“CT”,“GA”,“GC”,“GG”,“GT”,“TA”,“TC”,“TG”,“TT”].</p>
+<p>This methodology relies on two additional hypotheses. <span class="math inline">\(H_2\)</span> requires that DNA N-grams such as
+bi-, tri-, and tetra-nucleotide pairings do not occur randomly, and H3
+requires that these N-gram frequency patterns are conserved and
+identifiable. In fact, it has been well-demonstrated that di-, tri-, and
+poly-nucleotide repeats are not random and highly conserved. Given <span class="math inline">\(H_2\)</span> and <span class="math inline">\(H_3\)</span>, DNA N-gram frequency patterns can be
+leveraged to construct a generalized stochastic model which can be used
+to efficiently solve a variety of supervised classification and data
+reduction problems relevant to genomics and genetics.</p>
+</div>
+<div id="overview" class="section level1">
+<h1>Overview:</h1>
+<p>A graphic illustration of this methodology and experimental design
+was provided in <strong>Figure 1</strong>, where continuous DNA segments
+ranging from 10 to 100kb in length were randomly selected from each of
+the five species’ (human, bat, elephant, koala, and dolphin) reference
+genomes to develop a training and validation sets, each consisting of
+10Mb of continuous DNA sequence. The main goal of this experiment was to
+classify unknown sequence fragments based on established DNA N-gram
+frequency patterns. This experiment also examined the relationship
+between this model’s classification performance as a function of N-gram
+order and segment length. Therefore, second, third, fourth, and fifth
+order N-grams can be analyzed and compared. Specifically, unknown human
+DNA segments totaling 10Mb and ranging from 10 to 100kb were classified
+against each of the four mammals. The five sequence lengths tested were
+10, 20, 40, 80, and 100kb. The number of validation tests was equal to
+the total sequence length (10Mb) divided by the segment length.<br />
+<br></p>
+<div id="demonstration-1---supervised-binary-classification" class="section level2">
+<h2>Demonstration 1 - Supervised Binary Classification</h2>
+<p>In this demonstration, we will analyze 20MB of DNA sequence from the
+human and bat reference genomes.</p>
+<p>We will calculate fifth-order N-grams to classify unknown DNA
+sequence fragments 100kb in length from two species (human and bat).</p>
+<div id="getting-started" class="section level3">
+<h3>Getting Started</h3>
+<p>To get started, install and load the DNA-NAMER library. First, you’ll
+need “devtools”, “remotes”, and “githubinstall” libraries.</p>
+<pre><code># Install and Load &quot;devtools&quot;
+install.packages(&quot;devtools&quot;)
+library(&quot;devtools&quot;)
+
+# Install and Load &quot;remotes&quot;
+install.packages(&quot;remotes&quot;)
+library(&quot;remotes&quot;)
+
+# Install and Load &quot;githubinstall&quot;
+install.packages(&quot;githubinstall&quot;)
+library(&quot;githubinstall&quot;)
+
+# Finally! We can install &quot;DNAnamer&quot;
+remotes::install_git(&quot;https://gitlab.com/jmal0403/DNAnamer&quot;)
+</code></pre>
+</div>
+<div id="download-reference-genomes-via-ncbi" class="section level3">
+<h3>Download Reference Genomes via NCBI</h3>
+<p>Next, we need to download the reference genomes for both species.</p>
+</div>
+<div id="load-the-data" class="section level3">
+<h3>Load the data</h3>
+<pre><code># Load Human Reference Genome
+human.genome&lt;-loadRefGenome(&quot;Homo sapiens&quot;)
+# Load Bat Reference Genome
+bat.genome&lt;-loadRefGenome(&quot;Miniopterus natalensis&quot;)</code></pre>
+</div>
+<div id="randomly-pull-sequence-data.frames-from-reference-genomes" class="section level3">
+<h3>Randomly pull sequence data.frames from reference genomes</h3>
+<pre><code># Total Sequence
+total.seq = 20000000
+# N-gram Order
+order=5
+# DNA segment length
+segment.length = 100000
+# Number of Tests
+no.tests&lt;- total.seq/segment.length
+
+# Get Sequence Human Reference Genome
+human.seq.df &lt;- getSequence(&quot;Homo sapiens&quot;, human.genome, total.seq, segment.length)
+# Load Bat Reference Genome
+bat.seq.df &lt;- getSequence(&quot;Miniopterus natalensis&quot;, bat.genome, total.seq, segment.length)</code></pre>
+</div>
+<div id="calculate-n-gram-frequency-tables-and-construct-test-frequency-matrix" class="section level3">
+<h3>Calculate N-gram frequency tables and construct test-frequency
+matrix</h3>
+<pre><code>human.df &lt;- getFreqDF(human.seq.df, total.seq, segment.length, order, &quot;H&quot;)
+bat.df &lt;- getFreqDF(bat.seq.df, total.seq, segment.length, order, &quot;B&quot;)
+</code></pre>
+</div>
+<div id="run-svm-binary-classification" class="section level3">
+<h3>Run SVM (binary) classification</h3>
+<p>The Support Vector Machine (SVM) methodology was selected for the
+binary classification experiments. Namely, a radial kernel was selected
+with a cost of 3 and a sigma value of 0.2.</p>
+<pre><code># Add Code</code></pre>
+</div>
+</div>
+<div id="conclusions" class="section level2">
+<h2>Conclusions</h2>
+</div>
+</div>
+
+
+
+<!-- code folding -->
+
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src  = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+
+</body>
+</html>

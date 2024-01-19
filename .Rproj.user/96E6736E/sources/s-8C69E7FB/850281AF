@@ -1,0 +1,26 @@
+{
+    "id": "850281AF",
+    "path": "~/Desktop/DNA N-gram Classifier/CODE/N-gram_SEQ_CLASSIFIER_LIB.R",
+    "project_path": null,
+    "type": "r_source",
+    "hash": "0",
+    "contents": "",
+    "dirty": false,
+    "created": 1705627709281.0,
+    "source_on_save": false,
+    "relative_order": 1,
+    "properties": {
+        "source_window_id": "",
+        "Source": "Source",
+        "cursorPosition": "40,0",
+        "scrollLine": "18"
+    },
+    "folds": "24|48|38|0|\n40|29|50|0|\n52|51|58|0|\n60|75|124|0|\n",
+    "lastKnownWriteTime": 1705517916,
+    "encoding": "UTF-8",
+    "collab_server": "",
+    "source_window": "",
+    "last_content_update": 1705630500259,
+    "read_only": false,
+    "read_only_alternatives": []
+}
