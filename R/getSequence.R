@@ -1,7 +1,6 @@
 
 getSequence <- function(organism.name, Genome, total.seq.length, seg.len) {
   library(stringr)
-  options(warn=-1)
   # Join all contigs
   if (organism.name == "Homo sapiens") {
     seq.char <- toString(Genome[2:33])
