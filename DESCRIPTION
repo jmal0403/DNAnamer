@@ -7,7 +7,7 @@ Maintainer: John <jmal0403@gmail.com>
 Description: A toolkit for the binary and multi-class supervised classification of DNA sequences based on their DNA N-gram frequency patterns.
 License: 
 Encoding: UTF-8
-LazyData: true
+LazyData: false
 Imports: 
     testthat,
     knitr,
