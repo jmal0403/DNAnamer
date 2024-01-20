@@ -28,7 +28,6 @@
 </details>
 
 
-
 <!-- ABOUT THE PROJECT -->
 ## About The Project
  
@@ -56,7 +55,8 @@ library("remotes")
 install.packages("githubinstall")
 library("githubinstall")
 
-remotes::install_git("https://gitlab.com/jmal0403/DNAnamer")
+remotes::install_git("https://github.com/jmal0403/DNAnamer", dependencies=TRUE, force=TRUE)
+library(DNAnamer)
 
 ### Prerequisites
 
