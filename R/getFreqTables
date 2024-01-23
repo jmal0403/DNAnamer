@@ -2,14 +2,13 @@ getFreqTables <- function(df, order, organism) {
   if (order == 2) {
     freq.df <- as.data.frame(t(df[,1:(4^order)]))
     freq.df$organism <-organism
-    freq.df<- as.data.frame(cbind(seq=rownames(freq.df), freq.df))
-    return(freq.df)
+    freq.df <- as.data.frame(cbind(seq=rownames(freq.df), freq.df))
   }
   if (order == 3) {
     start <- 4^2+1
     freq.df <- as.data.frame(t(df[,start:(4^order+4^2)]))
     freq.df$organism <-organism
     freq.df<- as.data.frame(cbind(seq=rownames(freq.df), freq.df))
-    return(freq.df)
   }
+  return(freq.df)
 }
