@@ -24,7 +24,7 @@ getSequence <- function(organism.name, Genome, total.seq.length, seg.len) {
   start.index <- sample(1:(genome.len-total.seq.length),1,replace=F)
   seq.char <- substr(seq.char,start=start.index,stop=start.index+total.seq.length)  
   seq.df <- as.data.frame(splitStr(seq.char, seg.len))
-  seq.df <- seq.df[1:(total.seq.length/seg.len),1]
+  seq.df <- as.data.frame(human.seq.df[1:(total.seq.length/seg.len),])
   colnames(seq.df)<- "seq"
   return(seq.df)
 }
