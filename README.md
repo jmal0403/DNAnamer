@@ -47,15 +47,20 @@ R version 3.4.2
 ## Getting Started
 
 install.packages("devtools")
+
 library("devtools")
 
 install.packages("remotes")
+
 library("remotes")
 
 install.packages("githubinstall")
+
 library("githubinstall")
 
+
 remotes::install_git("https://github.com/jmal0403/DNAnamer", dependencies=TRUE, force=TRUE)
+
 library(DNAnamer)
 
 ### Prerequisites
