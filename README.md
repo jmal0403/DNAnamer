@@ -89,7 +89,7 @@ Distributed under the MIT License. See `LICENSE.txt` for more information.
 <!-- CONTACT -->
 ## Contact
 
-Your Name - John Stephen Malamon, Ph.D.
+Author - John Stephen Malamon, Ph.D.
 
 Project Link: [https://github.com/jmal0403/DNAnamer](https://github.com/jmal0403/DNAnamer)
 
